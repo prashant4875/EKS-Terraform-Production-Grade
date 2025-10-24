@@ -1,0 +1,13 @@
+{
+  "company": "CloudWorks",
+  "location": "Bangalore",
+  "employees": [
+    { "name": "Alice", "role": "DevOps", "age": 30, "skills": ["AWS", "Terraform", "Kubernetes"] },
+    { "name": "Bob", "role": "Developer", "age": 26, "skills": ["Python", "Flask", "Docker"] },
+    { "name": "Charlie", "role": "Manager", "age": 35, "skills": ["Leadership", "Scrum", "Planning"] }
+  ],
+  "projects": {
+    "active": ["infra-migration", "k8s-hardening"],
+    "completed": ["ci-cd-pipeline", "cloud-monitoring"]
+  }
+}

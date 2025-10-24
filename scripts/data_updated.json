@@ -1,0 +1,32 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": "Alice",
+            "role": "admin",
+            "active": true
+        },
+        {
+            "id": 2,
+            "name": "Bob",
+            "role": "developer",
+            "active": false
+        },
+        {
+            "id": 3,
+            "name": "Charlie",
+            "role": "admin",
+            "active": true
+        }
+    ],
+    "project": {
+        "name": "CI-CD Automation",
+        "language": "Python",
+        "tools": [
+            "Jenkins",
+            "Terraform",
+            "Docker",
+            "Kubernetes"
+        ]
+    }
+}

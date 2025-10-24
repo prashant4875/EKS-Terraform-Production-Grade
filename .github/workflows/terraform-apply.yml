@@ -1,0 +1,143 @@
+name: 'Terraform Apply'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'environments/**'
+      - 'modules/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  TF_VERSION: '1.5.7'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  terraform-apply:
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.event.inputs.environment || 'dev' }}
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+    #   - name: Configure AWS Credentials
+    #     uses: aws-actions/configure-aws-credentials@v4
+    #     with:
+    #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #       aws-region: ${{ env.AWS_REGION }}
+    
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::274601145879:role/GithubOIDCRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Determine Environment
+        id: determine-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          else
+            echo "environment=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Terraform Init
+        working-directory: ./environments/${{ steps.determine-env.outputs.environment }}
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./environments/${{ steps.determine-env.outputs.environment }}
+        run: terraform plan -no-color -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ./environments/${{ steps.determine-env.outputs.environment }}
+        run: terraform apply -auto-approve tfplan
+
+      - name: Get Outputs
+        id: outputs
+        working-directory: ./environments/${{ steps.determine-env.outputs.environment }}
+        run: |
+          echo "cluster_endpoint=$(terraform output -raw cluster_endpoint)" >> $GITHUB_OUTPUT
+          echo "cluster_id=$(terraform output -raw cluster_id)" >> $GITHUB_OUTPUT
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ steps.outputs.outputs.cluster_id }}
+          kubectl get nodes
+
+      - name: Create Deployment Summary
+        run: |
+          echo "## Terraform Apply Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ steps.determine-env.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Cluster ID:** ${{ steps.outputs.outputs.cluster_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Cluster Endpoint:** ${{ steps.outputs.outputs.cluster_endpoint }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Kubernetes Nodes" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          kubectl get nodes >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+    #   - name: Notify Slack on Success
+    #     if: success()
+    #     uses: slackapi/slack-github-action@v1.24.0
+    #     with:
+    #       payload: |
+    #         {
+    #           "text": "✅ Terraform Apply Successful",
+    #           "blocks": [
+    #             {
+    #               "type": "section",
+    #               "text": {
+    #                 "type": "mrkdwn",
+    #                 "text": "*Terraform Apply Successful* ✅\n*Environment:* ${{ steps.determine-env.outputs.environment }}\n*Cluster:* ${{ steps.outputs.outputs.cluster_id }}\n*By:* ${{ github.actor }}"
+    #               }
+    #             }
+    #           ]
+    #         }
+    #     env:
+    #       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    #   - name: Notify Slack on Failure
+    #     if: failure()
+    #     uses: slackapi/slack-github-action@v1.24.0
+    #     with:
+    #       payload: |
+    #         {
+    #           "text": "❌ Terraform Apply Failed",
+    #           "blocks": [
+    #             {
+    #               "type": "section",
+    #               "text": {
+    #                 "type": "mrkdwn",
+    #                 "text": "*Terraform Apply Failed* ❌\n*Environment:* ${{ steps.determine-env.outputs.environment }}\n*By:* ${{ github.actor }}\n*View logs:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+    #               }
+    #             }
+    #           ]
+    #         }
+    #     env:
+    #       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
