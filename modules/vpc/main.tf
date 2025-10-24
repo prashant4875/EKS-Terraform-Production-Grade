@@ -1,9 +1,9 @@
 locals {
-    azs = slice(data.aws_availability_zones.available.names, 0, var.az_count)
+  azs = slice(data.aws_availability_zones.available.names, 0, var.az_count)
 }
 
 data "aws_availability_zones" "available" {
-    state = "available"
+  state = "available"
 }
 
 resource "aws_vpc" "main" {
@@ -14,8 +14,8 @@ resource "aws_vpc" "main" {
   tags = merge(
     var.tags,
     {
-      Name                                           = "${var.environment}-vpc"
-      "kubernetes.io/cluster/${var.cluster_name}"    = "shared"
+      Name                                        = "${var.environment}-vpc"
+      "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     }
   )
 }
@@ -42,9 +42,9 @@ resource "aws_subnet" "public" {
   tags = merge(
     var.tags,
     {
-      Name                                           = "${var.environment}-public-subnet-${count.index + 1}"
-      "kubernetes.io/cluster/${var.cluster_name}"    = "shared"
-      "kubernetes.io/role/elb"                       = "1"
+      Name                                        = "${var.environment}-public-subnet-${count.index + 1}"
+      "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+      "kubernetes.io/role/elb"                    = "1"
     }
   )
 }
@@ -58,9 +58,9 @@ resource "aws_subnet" "private" {
   tags = merge(
     var.tags,
     {
-      Name                                           = "${var.environment}-private-subnet-${count.index + 1}"
-      "kubernetes.io/cluster/${var.cluster_name}"    = "shared"
-      "kubernetes.io/role/internal-elb"              = "1"
+      Name                                        = "${var.environment}-private-subnet-${count.index + 1}"
+      "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+      "kubernetes.io/role/internal-elb"           = "1"
     }
   )
 }
@@ -141,11 +141,11 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_flow_log" "main" {
-  count                = var.enable_flow_logs ? 1 : 0
-  iam_role_arn         = aws_iam_role.flow_logs[0].arn
-  log_destination      = aws_cloudwatch_log_group.flow_logs[0].arn
-  traffic_type         = "ALL"
-  vpc_id               = aws_vpc.main.id
+  count           = var.enable_flow_logs ? 1 : 0
+  iam_role_arn    = aws_iam_role.flow_logs[0].arn
+  log_destination = aws_cloudwatch_log_group.flow_logs[0].arn
+  traffic_type    = "ALL"
+  vpc_id          = aws_vpc.main.id
 
   tags = merge(
     var.tags,
@@ -199,7 +199,7 @@ resource "aws_iam_role_policy" "flow_logs" {
           "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = "*"
       }
     ]
@@ -222,7 +222,7 @@ resource "aws_iam_role_policy" "flow_logs" {
           "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = "*"
       }
     ]

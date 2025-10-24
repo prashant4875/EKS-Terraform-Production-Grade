@@ -38,7 +38,7 @@ resource "aws_eks_node_group" "main" {
   tags = merge(
     var.tags,
     {
-      Name = var.node_group_name
+      Name                                            = var.node_group_name
       "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
       "k8s.io/cluster-autoscaler/enabled"             = "true"
     }
@@ -95,9 +95,9 @@ resource "aws_launch_template" "node_group" {
   }
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    cluster_name        = var.cluster_name
-    cluster_endpoint    = var.cluster_endpoint
-    cluster_ca          = var.cluster_ca
+    cluster_name         = var.cluster_name
+    cluster_endpoint     = var.cluster_endpoint
+    cluster_ca           = var.cluster_ca
     bootstrap_extra_args = var.bootstrap_extra_args
   }))
 
@@ -156,7 +156,7 @@ resource "aws_security_group" "node_group" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.node_group_name}-sg"
+      Name                                        = "${var.node_group_name}-sg"
       "kubernetes.io/cluster/${var.cluster_name}" = "owned"
     }
   )

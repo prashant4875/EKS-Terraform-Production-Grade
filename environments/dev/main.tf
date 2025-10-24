@@ -58,7 +58,7 @@ provider "helm" {
 
 locals {
   cluster_name = "${var.environment}-${var.project_name}-eks"
-  
+
   common_tags = {
     Environment = var.environment
     Project     = var.project_name
@@ -70,29 +70,29 @@ locals {
 module "vpc" {
   source = "../../modules/vpc"
 
-  environment            = var.environment
-  vpc_cidr              = var.vpc_cidr
-  cluster_name          = local.cluster_name
-  az_count              = var.az_count
-  enable_nat_gateway    = var.enable_nat_gateway
-  enable_flow_logs      = var.enable_flow_logs
-  
+  environment        = var.environment
+  vpc_cidr           = var.vpc_cidr
+  cluster_name       = local.cluster_name
+  az_count           = var.az_count
+  enable_nat_gateway = var.enable_nat_gateway
+  enable_flow_logs   = var.enable_flow_logs
+
   tags = local.common_tags
 }
 
 module "eks" {
   source = "../../modules/eks"
 
-  cluster_name            = local.cluster_name
-  cluster_version         = var.cluster_version
-  vpc_id                  = module.vpc.vpc_id
-  private_subnet_ids      = module.vpc.private_subnet_ids
-  public_subnet_ids       = module.vpc.public_subnet_ids
-  endpoint_private_access = var.endpoint_private_access
-  endpoint_public_access  = var.endpoint_public_access
-  public_access_cidrs     = var.public_access_cidrs
+  cluster_name              = local.cluster_name
+  cluster_version           = var.cluster_version
+  vpc_id                    = module.vpc.vpc_id
+  private_subnet_ids        = module.vpc.private_subnet_ids
+  public_subnet_ids         = module.vpc.public_subnet_ids
+  endpoint_private_access   = var.endpoint_private_access
+  endpoint_public_access    = var.endpoint_public_access
+  public_access_cidrs       = var.public_access_cidrs
   enabled_cluster_log_types = var.enabled_cluster_log_types
-  
+
   tags = local.common_tags
 
   depends_on = [module.vpc]
@@ -113,13 +113,13 @@ module "node_group_on_demand" {
   disk_size                 = var.disk_size
   vpc_id                    = module.vpc.vpc_id
   cluster_security_group_id = module.eks.cluster_security_group_id
-  
+
   labels = {
-    role         = "general"
-    environment  = var.environment
+    role          = "general"
+    environment   = var.environment
     capacity-type = "on-demand"
   }
-  
+
   tags = local.common_tags
 
   depends_on = [module.eks]
@@ -140,13 +140,13 @@ module "node_group_spot" {
   disk_size                 = var.disk_size
   vpc_id                    = module.vpc.vpc_id
   cluster_security_group_id = module.eks.cluster_security_group_id
-  
+
   labels = {
     role          = "worker"
     environment   = var.environment
     capacity-type = "spot"
   }
-  
+
   taints = [
     {
       key    = "spot"
@@ -154,7 +154,7 @@ module "node_group_spot" {
       effect = "NoSchedule"
     }
   ]
-  
+
   tags = local.common_tags
 
   depends_on = [module.eks]
