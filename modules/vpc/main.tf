@@ -163,7 +163,7 @@ resource "aws_cloudwatch_log_group" "flow_logs" {
   tags = var.tags
 }
 
-resource "aws_iam_role" "flow_logs" {
+resource "aws_iam_role" "flow_logs_role" {
   count = var.enable_flow_logs ? 1 : 0
   name  = "${var.environment}-vpc-flow-logs-role"
 
@@ -183,7 +183,7 @@ resource "aws_iam_role" "flow_logs" {
   tags = var.tags
 }
 
-resource "aws_iam_role_policy" "flow_logs" {
+resource "aws_iam_role_policy" "flow_logs_policy" {
   count = var.enable_flow_logs ? 1 : 0
   name  = "${var.environment}-vpc-flow-logs-policy"
   role  = aws_iam_role.flow_logs[0].id
@@ -206,7 +206,7 @@ resource "aws_iam_role_policy" "flow_logs" {
   })
 }
 
-resource "aws_iam_role_policy" "flow_logs" {
+resource "aws_iam_role_policy" "flow_logs_policy_1" {
   count = var.enable_flow_logs ? 1 : 0
   name  = "${var.environment}-vpc-flow-logs-policy"
   role  = aws_iam_role.flow_logs[0].id
