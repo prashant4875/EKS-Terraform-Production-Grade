@@ -45,7 +45,6 @@ resource "aws_eks_node_group" "main" {
   )
 
   depends_on = [
-    aws_iam_service_linked_role.eks_nodegroup,
     aws_iam_role_policy_attachment.node_group_policy,
     aws_iam_role_policy_attachment.cni_policy,
     aws_iam_role_policy_attachment.container_registry_policy,
