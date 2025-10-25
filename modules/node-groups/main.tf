@@ -105,6 +105,7 @@ resource "aws_launch_template" "node_group" {
   tags = var.tags
 }
 
+
 resource "aws_iam_service_linked_role" "eks_nodegroup" {
   aws_service_name = "eks-nodegroup.amazonaws.com"
 
