@@ -72,7 +72,7 @@ jobs:
         uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
-          approvers: devops-team
+          approvers: prashant4875
           minimum-approvals: 1
           issue-title: "Approve Terraform Destroy for ${{ github.event.inputs.environment }}"
           issue-body: "Please approve the destruction of ${{ github.event.inputs.environment }} environment"
