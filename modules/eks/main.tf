@@ -86,17 +86,17 @@ resource "aws_eks_addon" "vpc_cni" {
   tags = var.tags
 }
 
-resource "aws_eks_addon" "coredns" {
-  cluster_name                = aws_eks_cluster.main.name
-  addon_name                  = "coredns"
-  addon_version               = var.coredns_version
-  resolve_conflicts_on_create = "OVERWRITE"
-  resolve_conflicts_on_update = "PRESERVE"
+# resource "aws_eks_addon" "coredns" {
+#   cluster_name                = aws_eks_cluster.main.name
+#   addon_name                  = "coredns"
+#   addon_version               = var.coredns_version
+#   resolve_conflicts_on_create = "OVERWRITE"
+#   resolve_conflicts_on_update = "PRESERVE"
 
-  tags = var.tags
+#   tags = var.tags
 
-  depends_on = [aws_eks_addon.vpc_cni]
-}
+#   depends_on = [aws_eks_addon.vpc_cni]
+# }
 
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name                = aws_eks_cluster.main.name
@@ -108,13 +108,13 @@ resource "aws_eks_addon" "kube_proxy" {
   tags = var.tags
 }
 
-resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name                = aws_eks_cluster.main.name
-  addon_name                  = "aws-ebs-csi-driver"
-  addon_version               = var.ebs_csi_driver_version
-  service_account_role_arn    = aws_iam_role.ebs_csi_driver.arn
-  resolve_conflicts_on_create = "OVERWRITE"
-  resolve_conflicts_on_update = "PRESERVE"
+# resource "aws_eks_addon" "ebs_csi_driver" {
+#   cluster_name                = aws_eks_cluster.main.name
+#   addon_name                  = "aws-ebs-csi-driver"
+#   addon_version               = var.ebs_csi_driver_version
+#   service_account_role_arn    = aws_iam_role.ebs_csi_driver.arn
+#   resolve_conflicts_on_create = "OVERWRITE"
+#   resolve_conflicts_on_update = "PRESERVE"
 
-  tags = var.tags
-}
+#   tags = var.tags
+# }
