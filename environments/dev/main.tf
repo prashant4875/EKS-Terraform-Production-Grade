@@ -48,16 +48,16 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
-# provider "helm" {
-#   kubernetes {
-#     host                   = data.aws_eks_cluster.cluster.endpoint
-#     cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
-#     token                  = data.aws_eks_cluster_auth.cluster.token
-#   }
-# }
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
+  }
+}
 
 locals {
-  cluster_name = "${var.environment}-${var.project_name}-eks-new"
+  cluster_name = "${var.environment}-${var.project_name}-eks"
 
   common_tags = {
     Environment = var.environment
@@ -160,83 +160,83 @@ module "node_group_spot" {
   depends_on = [module.eks]
 }
 
-# resource "helm_release" "metrics_server" {
-#   name       = "metrics-server"
-#   repository = "https://kubernetes-sigs.github.io/metrics-server/"
-#   chart      = "metrics-server"
-#   namespace  = "kube-system"
-#   version    = "3.11.0"
+resource "helm_release" "metrics_server" {
+  name       = "metrics-server"
+  repository = "https://kubernetes-sigs.github.io/metrics-server/"
+  chart      = "metrics-server"
+  namespace  = "kube-system"
+  version    = "3.11.0"
 
-#   set {
-#     name  = "args[0]"
-#     value = "--kubelet-insecure-tls"
-#   }
+  set {
+    name  = "args[0]"
+    value = "--kubelet-insecure-tls"
+  }
 
-#   depends_on = [module.eks]
-# }
+  depends_on = [module.eks]
+}
 
-# resource "helm_release" "cluster_autoscaler" {
-#   name       = "cluster-autoscaler"
-#   repository = "https://kubernetes.github.io/autoscaler"
-#   chart      = "cluster-autoscaler"
-#   namespace  = "kube-system"
-#   version    = "9.29.3"
+resource "helm_release" "cluster_autoscaler" {
+  name       = "cluster-autoscaler"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler"
+  namespace  = "kube-system"
+  version    = "9.29.3"
 
-#   set {
-#     name  = "autoDiscovery.clusterName"
-#     value = module.eks.cluster_id
-#   }
+  set {
+    name  = "autoDiscovery.clusterName"
+    value = module.eks.cluster_id
+  }
 
-#   set {
-#     name  = "awsRegion"
-#     value = var.aws_region
-#   }
+  set {
+    name  = "awsRegion"
+    value = var.aws_region
+  }
 
-#   set {
-#     name  = "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-#     value = module.eks.cluster_autoscaler_role_arn
-#   }
+  set {
+    name  = "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.eks.cluster_autoscaler_role_arn
+  }
 
-#   set {
-#     name  = "extraArgs.balance-similar-node-groups"
-#     value = "true"
-#   }
+  set {
+    name  = "extraArgs.balance-similar-node-groups"
+    value = "true"
+  }
 
-#   set {
-#     name  = "extraArgs.skip-nodes-with-system-pods"
-#     value = "false"
-#   }
+  set {
+    name  = "extraArgs.skip-nodes-with-system-pods"
+    value = "false"
+  }
 
-#   depends_on = [module.node_group_on_demand]
-# }
+  depends_on = [module.node_group_on_demand]
+}
 
-# resource "helm_release" "aws_load_balancer_controller" {
-#   name       = "aws-load-balancer-controller"
-#   repository = "https://aws.github.io/eks-charts"
-#   chart      = "aws-load-balancer-controller"
-#   namespace  = "kube-system"
-#   version    = "1.6.2"
+resource "helm_release" "aws_load_balancer_controller" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
+  version    = "1.6.2"
 
-#   set {
-#     name  = "clusterName"
-#     value = module.eks.cluster_id
-#   }
+  set {
+    name  = "clusterName"
+    value = module.eks.cluster_id
+  }
 
-#   set {
-#     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-#     value = module.eks.aws_load_balancer_controller_role_arn
-#   }
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.eks.aws_load_balancer_controller_role_arn
+  }
 
-#   set {
-#     name  = "region"
-#     value = var.aws_region
-#   }
+  set {
+    name  = "region"
+    value = var.aws_region
+  }
 
-#   set {
-#     name  = "vpcId"
-#     value = module.vpc.vpc_id
-#   }
+  set {
+    name  = "vpcId"
+    value = module.vpc.vpc_id
+  }
 
-#   depends_on = [module.node_group_on_demand]
-# }
+  depends_on = [module.node_group_on_demand]
+}
 
