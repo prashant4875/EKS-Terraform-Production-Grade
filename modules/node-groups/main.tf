@@ -45,6 +45,7 @@ resource "aws_eks_node_group" "main" {
   )
 
   depends_on = [
+    aws_iam_service_linked_role.eks_nodegroup,
     aws_iam_role_policy_attachment.node_group_policy,
     aws_iam_role_policy_attachment.cni_policy,
     aws_iam_role_policy_attachment.container_registry_policy,
@@ -102,6 +103,12 @@ resource "aws_launch_template" "node_group" {
   # }))
 
   tags = var.tags
+}
+
+resource "aws_iam_service_linked_role" "eks_nodegroup" {
+  aws_service_name = "eks-nodegroup.amazonaws.com"
+
+  description = "Service-linked role required by Amazon EKS to manage node groups"
 }
 
 resource "aws_iam_role" "node_group" {
