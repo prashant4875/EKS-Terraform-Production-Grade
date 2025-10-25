@@ -151,7 +151,7 @@ module "node_group_spot" {
     {
       key    = "spot"
       value  = "true"
-      effect = "NoSchedule"
+      effect = "NO_SCHEDULE"
     }
   ]
 
