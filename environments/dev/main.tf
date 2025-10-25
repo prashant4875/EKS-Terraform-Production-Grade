@@ -57,7 +57,7 @@ provider "kubernetes" {
 # }
 
 locals {
-  cluster_name = "${var.environment}-${var.project_name}-eks-new"
+  cluster_name = "${var.environment}-${var.project_name}-eks"
 
   common_tags = {
     Environment = var.environment
