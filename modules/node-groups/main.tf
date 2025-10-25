@@ -94,12 +94,12 @@ resource "aws_launch_template" "node_group" {
     )
   }
 
-  user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    cluster_name         = var.cluster_name
-    cluster_endpoint     = var.cluster_endpoint
-    cluster_ca           = var.cluster_ca
-    bootstrap_extra_args = var.bootstrap_extra_args
-  }))
+  # user_data = base64encode(templatefile("${path.module}/user_data.sh", {
+  #   cluster_name         = var.cluster_name
+  #   cluster_endpoint     = var.cluster_endpoint
+  #   cluster_ca           = var.cluster_ca
+  #   bootstrap_extra_args = var.bootstrap_extra_args
+  # }))
 
   tags = var.tags
 }
