@@ -68,14 +68,14 @@ jobs:
         working-directory: ./environments/${{ github.event.inputs.environment }}
         run: terraform plan -destroy -no-color
 
-      - name: Wait for Manual Approval
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ github.TOKEN }}
-          approvers: prashant4875
-          minimum-approvals: 1
-          issue-title: "Approve Terraform Destroy for ${{ github.event.inputs.environment }}"
-          issue-body: "Please approve the destruction of ${{ github.event.inputs.environment }} environment"
+      # - name: Wait for Manual Approval
+      #   uses: trstringer/manual-approval@v1
+      #   with:
+      #     secret: ${{ github.TOKEN }}
+      #     approvers: prashant4875
+      #     minimum-approvals: 1
+      #     issue-title: "Approve Terraform Destroy for ${{ github.event.inputs.environment }}"
+      #     issue-body: "Please approve the destruction of ${{ github.event.inputs.environment }} environment"
 
       - name: Terraform Destroy
         working-directory: ./environments/${{ github.event.inputs.environment }}
